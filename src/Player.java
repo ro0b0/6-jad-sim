@@ -66,6 +66,9 @@ public class Player {
         this.hasTwistedBow =  hasTwistedBow;
     }
 
+    //The game calculates a max attack roll based on your attack bonuses, stats, prayers and set bonuses.
+    //This max roll is calculated here. A number rolled from 0 - maxRoll is  then used in the accuracy check
+    //to check if you hit on the jad or not.
     public int getMaxRangedAttackRoll() {
         double rigour = 1;
         double twistedBow = 1;
@@ -87,6 +90,11 @@ public class Player {
         return (int) attackRoll;
     }
 
+    //This part calculates whether or not your attack has hit. Because of the way the Old School Runescape
+    //accuracy checks work, it first checks the maxAttackRoll of the player and the maxDefenceRoll of the jad
+    //against eachother, and then chooses the formula to use based on this.
+    //It also has a separate check to see if the Dragon warhammer landed a hit but rolled a 0, since the hammer
+    //does not reduce defence on a 0 regardless of the accuracy roll.
     public boolean doesAttackHit(int maxAttackRoll, int maxDefenceRoll, boolean dwh){
         Random random = new Random();
         double accuracy;
@@ -100,6 +108,12 @@ public class Player {
             }
         }else{
             accuracy = (double) maxAttackRoll / (2 * ((double) maxDefenceRoll + 1));
+            if(dwh){
+                int dwhHit = random.nextInt(this.getMaxHit() + 1);
+                if(dwhHit == 0){
+                    return false;
+                }
+            }
         }
         return Math.random() < accuracy;
     }
